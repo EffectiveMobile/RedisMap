@@ -3,7 +3,6 @@ package by.smertex.redis.adapter.realisation;
 import by.smertex.redis.adapter.interfaces.RedisMapAdapter;
 import redis.clients.jedis.Jedis;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,7 +110,7 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         jedis.close();
     }
 
@@ -126,10 +125,12 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
 
     public RedisMapAdapterBasicRealisation(String host, int port) {
         this.jedis = new Jedis(host, port);
+        jedis.connect();
     }
 
     public RedisMapAdapterBasicRealisation(String host, int port, String password) {
         this.jedis = new Jedis(host, port);
         jedis.auth(password);
+        jedis.connect();
     }
 }
