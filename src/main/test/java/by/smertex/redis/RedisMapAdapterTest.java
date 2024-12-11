@@ -1,11 +1,8 @@
 package by.smertex.redis;
 
-import by.smertex.redis.adapter.interfaces.RedisMapAdapter;
-import by.smertex.redis.adapter.realisation.RedisMapAdapterBasicRealisation;
 import by.smertex.redis.adapter.realisation.RedisMapAdapterClosableWrapper;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
