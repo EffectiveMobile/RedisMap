@@ -2,6 +2,7 @@ package by.smertex.redis;
 
 import by.smertex.redis.adapter.interfaces.RedisMapAdapter;
 import by.smertex.redis.adapter.realisation.RedisMapAdapterBasicRealisation;
+import by.smertex.redis.adapter.realisation.RedisMapAdapterClosableWrapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,20 +23,16 @@ public class RedisMapAdapterTest {
 
     @Test
     void connectionTest() {
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             assert redisMapAdapter.isConnected();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Test
     void putTest(){
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             redisMapAdapter.put(KEY_TEST, VALUE_TEST);
             assert redisMapAdapter.get(KEY_TEST).equals(VALUE_TEST);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -50,12 +47,10 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             assert redisMapAdapter.containsKey(KEY_TEST);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -70,12 +65,10 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                             .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             assert redisMapAdapter.containsValue(VALUE_TEST);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -90,13 +83,11 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             assert redisMapAdapter.remove(KEY_TEST).equals(VALUE_TEST);
             assert redisMapAdapter.get(KEY_TEST) == null;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -115,15 +106,13 @@ public class RedisMapAdapterTest {
         IntStream.range(0, RANGE_TEST + 1)
                 .forEach(i -> map.put(keyTest.get(i), valueTest.get(i)));
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             redisMapAdapter.putAll(map);
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> {
                         assert redisMapAdapter.containsKey(keyTest.get(i));
                         assert redisMapAdapter.containsValue(valueTest.get(i));
                     });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -138,14 +127,12 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             keyTest.forEach(k -> {
                 assert redisMapAdapter.containsKey(k);
             });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -160,14 +147,12 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             valueTest.forEach(v -> {
                 assert redisMapAdapter.containsValue(v);
             });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -182,15 +167,13 @@ public class RedisMapAdapterTest {
         keyTest.add(KEY_TEST);
         valueTest.add(VALUE_TEST);
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             IntStream.range(0, RANGE_TEST + 1)
                     .forEach(i -> redisMapAdapter.put(keyTest.get(i), valueTest.get(i)));
             redisMapAdapter.forEach((key, value) -> {
                 assert keyTest.contains(key);
                 assert valueTest.contains(value);
             });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -198,12 +181,10 @@ public class RedisMapAdapterTest {
     void entryChangeValueTest(){
         String changeValue = "change";
 
-        try(RedisMapAdapter redisMapAdapter = new RedisMapAdapterBasicRealisation(HOST_TEST, PORT_TEST)) {
+        try(RedisMapAdapterClosableWrapper redisMapAdapter = new RedisMapAdapterClosableWrapper(HOST_TEST, PORT_TEST)) {
             redisMapAdapter.put(KEY_TEST, VALUE_TEST);
             redisMapAdapter.entrySet().forEach(entry -> entry.setValue(changeValue));
             assert redisMapAdapter.containsValue(changeValue);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
