@@ -1,6 +1,7 @@
 package by.smertex.redis.adapter.realisation;
 
 import by.smertex.redis.adapter.interfaces.RedisMapAdapter;
+import by.smertex.redis.exception.RedisMapAdapterException;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
@@ -29,6 +30,11 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
     }
 
     @Override
+    public long redisSize() {
+        return jedis.dbSize();
+    }
+
+    @Override
     public boolean isEmpty() {
         return jedis.dbSize() == 0;
     }
@@ -40,8 +46,12 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
 
     @Override
     public boolean containsValue(Object value) {
-        Object result = jedis.eval(CONTAINS_LUA, 0, value.toString());
-        return "1".equals(result.toString());
+        try {
+            Object result = jedis.eval(CONTAINS_LUA, 0, value.toString());
+            return "1".equals(result.toString());
+        } catch (RuntimeException e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
     }
 
     @Override
@@ -51,24 +61,40 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
 
     @Override
     public String put(String key, String value) {
-        return jedis.set(key, value);
+        try {
+            return jedis.set(key, value);
+        } catch (RuntimeException e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
     }
 
     @Override
     public String remove(Object key) {
-        String value = jedis.get(key.toString());
-        jedis.del(key.toString());
-        return value;
+        try {
+            String value = jedis.get(key.toString());
+            jedis.del(key.toString());
+            return value;
+        } catch (RuntimeException e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
     }
 
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
-        m.keySet().forEach(k -> jedis.set(k, m.get(k)));
+        try {
+            m.keySet().forEach(k -> jedis.set(k, m.get(k)));
+        } catch (RuntimeException e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
     }
 
     @Override
     public void clear() {
-        jedis.flushDB();
+        try {
+            jedis.flushDB();
+        } catch (RuntimeException e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
     }
 
     @Override

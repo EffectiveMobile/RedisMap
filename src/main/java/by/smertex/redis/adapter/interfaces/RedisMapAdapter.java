@@ -5,4 +5,6 @@ import java.util.Map;
 
 public interface RedisMapAdapter extends Map<String, String>, Closeable {
     boolean isConnected();
+
+    long redisSize();
 }
