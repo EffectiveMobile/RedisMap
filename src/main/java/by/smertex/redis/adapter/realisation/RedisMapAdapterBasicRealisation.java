@@ -8,6 +8,15 @@ import java.util.stream.Collectors;
 
 public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
 
+    private static final String CONTAINS_LUA = """
+                                               for _, key in ipairs(redis.call('keys', '*')) do
+                                                    if redis.call('get', key) == ARGV[1] then
+                                                        return 1
+                                                    end
+                                               end
+                                               return 0
+                                               """;
+
     private final Jedis jedis;
 
     @Override
@@ -31,7 +40,8 @@ public final class RedisMapAdapterBasicRealisation implements RedisMapAdapter {
 
     @Override
     public boolean containsValue(Object value) {
-        return values().contains(value.toString());
+        Object result = jedis.eval(CONTAINS_LUA, 0, value.toString());
+        return "1".equals(result.toString());
     }
 
     @Override
