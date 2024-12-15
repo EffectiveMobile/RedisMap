@@ -3,6 +3,7 @@ package org.redis.service;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.JedisPool;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,11 +12,6 @@ import java.util.stream.Collectors;
 public class MapIntoRedis implements Map<String, String> {
 
     private final JedisPool jedis = new JedisPool("127.0.0.1",6379);
-
-    public void pingRedis() throws Exception {
-
-        System.out.println(jedis.borrowObject().ping());
-    }
 
     @Override
     public int size() {
@@ -38,7 +34,11 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public boolean containsValue(Object value) {
 
-        return !jedis.getResource().keys(String.valueOf(value)).isEmpty();
+        //return !jedis.getResource().keys(String.valueOf(value)).isEmpty();
+
+      //  Object o = jedis.getResource().eval(jedis.getResource().get("*"), 0, value.toString());
+
+        return false;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MapIntoRedis implements Map<String, String> {
     public void putAll(Map<? extends String, ? extends String> m) {
 
         for (Entry<? extends String, ?> iter : m.entrySet()) {
-            jedis.getResource().set(iter.getKey().getBytes(), (byte[]) iter.getValue());
+            jedis.getResource().set(iter.getKey(), (String) iter.getValue());
         }
     }
 
@@ -92,6 +92,6 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public Set<Entry<String, String>> entrySet() {
 
-        return null;
+        return new HashSet<>();
     }
 }
