@@ -6,7 +6,6 @@ import by.smertex.redis.adapter.realisation.PoolConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.IntStream;
 
 public class ConnectionManagerTest {
