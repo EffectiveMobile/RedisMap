@@ -11,7 +11,8 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            mapIntoRedis.pingRedis();
+            mapIntoRedis.put("neo", "max");
+            System.out.println(mapIntoRedis.get("neo").equals("max"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

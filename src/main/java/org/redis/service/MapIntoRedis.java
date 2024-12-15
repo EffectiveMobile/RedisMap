@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class MapIntoRedis implements Map<String, Object> {
+public class MapIntoRedis implements Map<String, String> {
 
     private final JedisPool jedis = new JedisPool("127.0.0.1",6379);
 
@@ -32,7 +32,7 @@ public class MapIntoRedis implements Map<String, Object> {
     @Override
     public boolean containsKey(Object key) {
 
-        return jedis.getResource().exists((byte[]) key);
+        return jedis.getResource().exists(key.toString());
     }
 
     @Override
@@ -42,30 +42,34 @@ public class MapIntoRedis implements Map<String, Object> {
     }
 
     @Override
-    public Object get(Object key) {
+    public String get(Object key) {
 
-        return jedis.getResource().get((String) key);
+        return jedis.getResource().get(key.toString());
     }
 
     @Override
-    public Object put(String key, Object value) {
+    public String put(String key, String value) {
 
-        return jedis.getResource().set(key.getBytes(), (byte[]) value);
+        return jedis.getResource().set(key.getBytes(), value.getBytes());
     }
 
     @Override
-    public Object remove(Object key) {
+    public String remove(Object key) {
 
-        return jedis.getResource().del((String) key);
+       jedis.getResource().del(key.toString());
+       return "";
     }
 
     @Override
-    public void putAll(Map<? extends String, ?> m) {
+    public void putAll(Map<? extends String, ? extends String> m) {
 
         for (Entry<? extends String, ?> iter : m.entrySet()) {
             jedis.getResource().set(iter.getKey().getBytes(), (byte[]) iter.getValue());
         }
     }
+
+
+
 
     @Override
     public void clear() {
@@ -80,13 +84,13 @@ public class MapIntoRedis implements Map<String, Object> {
     }
 
     @Override
-    public Collection<Object> values() {
+    public Collection<String> values() {
 
         return this.keySet().stream().map(j->jedis.getResource().get(j)).collect(Collectors.toSet());
     }
 
     @Override
-    public Set<Entry<String, Object>> entrySet() {
+    public Set<Entry<String, String>> entrySet() {
 
         return null;
     }
