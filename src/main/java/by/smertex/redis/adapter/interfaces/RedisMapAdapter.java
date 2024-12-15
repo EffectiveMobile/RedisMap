@@ -1,15 +1,15 @@
 package by.smertex.redis.adapter.interfaces;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
+import java.io.Closeable;
 import java.util.Map;
 
-public interface RedisMapAdapter extends Map<String, String> {
+public interface RedisMapAdapter extends Map<String, String>, Closeable {
+
+    boolean isConnected();
 
     long redisSize();
 
-    Jedis getResource();
-
-    JedisPool getJedisPool();
+    Jedis getJedis();
 }

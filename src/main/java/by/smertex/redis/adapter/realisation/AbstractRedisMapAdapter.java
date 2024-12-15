@@ -20,11 +20,11 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
                                                return 0
                                                """;
 
-    private final JedisPool jedisPool;
+    private final Jedis jedis;
 
     @Override
     public int size() {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return (int) jedis.dbSize();
         } catch (ClassCastException e) {
             return -1;
@@ -33,7 +33,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public long redisSize() {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.dbSize();
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -42,7 +42,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public boolean isEmpty() {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.dbSize() == 0;
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -51,7 +51,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public boolean containsKey(Object key) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.exists(key.toString());
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -60,7 +60,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public boolean containsValue(Object value) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             Object result = jedis.eval(CONTAINS_LUA, 0, value.toString());
             return "1".equals(result.toString());
         } catch (RuntimeException e) {
@@ -70,7 +70,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public String get(Object key) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.get(key.toString());
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -79,7 +79,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public String put(String key, String value) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.set(key, value);
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -88,7 +88,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public String remove(Object key) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             String value = jedis.get(key.toString());
             jedis.del(key.toString());
             return value;
@@ -99,7 +99,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             m.keySet().forEach(k -> jedis.set(k, m.get(k)));
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -108,7 +108,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public void clear() {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             jedis.flushDB();
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -117,7 +117,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public Set<String> keySet() {
-        try(Jedis jedis = jedisPool.getResource()) {
+        try {
             return jedis.keys("*");
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
@@ -126,7 +126,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
 
     @Override
     public Collection<String> values() {
-        try (Jedis jedis = jedisPool.getResource()){
+        try {
             return keySet().stream()
                     .map(jedis::get)
                     .toList();
@@ -175,17 +175,27 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
         }
     }
 
+
     @Override
-    public Jedis getResource() {
-        return jedisPool.getResource();
+    public Jedis getJedis() {
+        return jedis;
     }
 
     @Override
-    public JedisPool getJedisPool() {
-        return jedisPool;
+    public boolean isConnected() {
+        return jedis.isConnected();
     }
 
-    public AbstractRedisMapAdapter(JedisPool jedisPool) {
-        this.jedisPool = jedisPool;
+    @Override
+    public void close() {
+        try {
+            jedis.close();
+        } catch (Exception e) {
+            throw new RedisMapAdapterException(e.getMessage());
+        }
+    }
+
+    public AbstractRedisMapAdapter(Jedis jedis) {
+        this.jedis = jedis;
     }
 }
