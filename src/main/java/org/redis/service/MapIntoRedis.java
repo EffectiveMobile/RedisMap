@@ -8,51 +8,89 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Класс пытается сделать мапу из мапы
+ */
 @RequiredArgsConstructor
 public class MapIntoRedis implements Map<String, String> {
 
+    /**
+     * экземпляр JedisPool присоединённый к 127.0.0.1 на пору 6379
+     */
     private final JedisPool jedis = new JedisPool("127.0.0.1",6379);
 
+    /**
+     * Метод показывает количество записей в бд
+     * @return int значение в виде количества записей в бд
+     */
     @Override
     public int size() {
 
         return (int) jedis.getResource().dbSize();
     }
 
+    /**
+     * Выдает информацию, о том, что пуста ли бд или нет
+     * @return true если пуста иначе false
+     */
     @Override
     public boolean isEmpty() {
 
         return jedis.getResource().dbSize() == 0L;
     }
 
+    /**
+     * Метод позволяет проверить наличие значения по ключу
+     * @param key собственно ключ типа String
+     * @return true если усть значение иначе false
+     */
     @Override
     public boolean containsKey(Object key) {
 
         return jedis.getResource().exists(key.toString());
     }
 
+    /**
+     * Не реализовано
+     * @param value value whose presence in this map is to be tested
+     * @return true или false
+     */
     @Override
     public boolean containsValue(Object value) {
 
-        //return !jedis.getResource().keys(String.valueOf(value)).isEmpty();
-
-      //  Object o = jedis.getResource().eval(jedis.getResource().get("*"), 0, value.toString());
+            // todo не реализовано
 
         return false;
     }
 
+    /**
+     * Метод нужен для получения значения по ключу
+     * @param key собственно ключ типа String
+     * @return String тип возвращаемого значения
+     */
     @Override
     public String get(Object key) {
 
         return jedis.getResource().get(key.toString());
     }
 
+    /**
+     * Метод положить в бд по ключу значение
+     * @param key собственно ключ типа String
+     * @param value String типзначения
+     * @return String тип возвращаемого значения
+     */
     @Override
     public String put(String key, String value) {
 
         return jedis.getResource().set(key.getBytes(), value.getBytes());
     }
 
+    /**
+     * Метод позволяет удалить значение по ключу
+     * @param key собственно ключ типа String
+     * @return String тип возвращаемого значения
+     */
     @Override
     public String remove(Object key) {
 
@@ -60,6 +98,10 @@ public class MapIntoRedis implements Map<String, String> {
        return "";
     }
 
+    /**
+     * Метод позволяет положит Map в бд
+     * @param m собственно мапа
+     */
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
 
@@ -68,9 +110,9 @@ public class MapIntoRedis implements Map<String, String> {
         }
     }
 
-
-
-
+    /**
+     * Метод служит для очистки бд
+     */
     @Override
     public void clear() {
 
