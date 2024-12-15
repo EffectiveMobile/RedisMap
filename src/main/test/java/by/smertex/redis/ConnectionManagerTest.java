@@ -57,5 +57,8 @@ public class ConnectionManagerTest {
         Thread.sleep(200);
         assert connectionManagerBasicRealisation.getSize() == POOL_EXPANSION_TEST - testRange;
 
+        Thread.sleep(1500);
+        System.out.println(connectionManagerBasicRealisation.getSize());
+        assert connectionManagerBasicRealisation.getSize() == POOL_SIZE_TEST;
     }
 }

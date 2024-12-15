@@ -24,8 +24,11 @@ public class ConnectionManagerBasicRealisation implements ConnectionManager<Redi
         return (RedisMapAdapter) Proxy.newProxyInstance(ConnectionManagerBasicRealisation.class.getClassLoader(),
                 new Class[]{RedisMapAdapter.class},
                 ((proxy, method, args) -> {
-                    if(method.getName().equals("close") && poolConfiguration.poolSize() > pool.size())
-                        return pool.add((RedisMapAdapter) proxy);
+                    if (method.getName().equals("close") && poolConfiguration.poolSize() > pool.size())
+                        synchronized (pool) {
+                            if (poolConfiguration.poolSize() > pool.size())
+                                return pool.add((RedisMapAdapter) proxy);
+                        }
                     return method.invoke(redisMapAdapter, args);
                 }));
     }
