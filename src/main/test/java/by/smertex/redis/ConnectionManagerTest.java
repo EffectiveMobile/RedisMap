@@ -6,6 +6,8 @@ import by.smertex.redis.adapter.realisation.PoolConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class ConnectionManagerTest {
 
@@ -24,6 +26,23 @@ public class ConnectionManagerTest {
         PoolConfiguration poolConfiguration = new PoolConfiguration(HOST_TEST, PORT_TEST, PASSWORD_TEST, POOL_SIZE_TEST, POOL_EXPANSION_TEST);
         ConnectionManagerBasicRealisation connectionManagerBasicRealisation = new ConnectionManagerBasicRealisation(poolConfiguration);
         assert connectionManagerBasicRealisation.getSize() == POOL_SIZE_TEST;
+    }
+
+    @Test
+    public void testReturnAdapter() throws IOException {
+        PoolConfiguration poolConfiguration = new PoolConfiguration(HOST_TEST, PORT_TEST, PASSWORD_TEST, POOL_SIZE_TEST, POOL_EXPANSION_TEST);
+        ConnectionManagerBasicRealisation connectionManagerBasicRealisation = new ConnectionManagerBasicRealisation(poolConfiguration);
+        RedisMapAdapter redisMapAdapter = connectionManagerBasicRealisation.getConnection();
+        redisMapAdapter.close();
+
+        assert IntStream.range(0, POOL_SIZE_TEST)
+                .anyMatch(i -> {
+                    try(RedisMapAdapter adapter = connectionManagerBasicRealisation.getConnection()){
+                        return adapter == redisMapAdapter;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     @Test
