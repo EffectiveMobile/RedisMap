@@ -52,8 +52,7 @@ public class ConnectionManagerBasicRealisation implements ConnectionManager<Redi
         try {
             if(pool.isEmpty()){
                 synchronized (ConnectionManagerBasicRealisation.class) {
-                    if(pool.isEmpty())
-                        expansionPool();
+                    if(pool.isEmpty()) expansionPool();
                 }
             }
             return pool.take();
