@@ -3,7 +3,6 @@ package by.smertex.redis.adapter.realisation;
 import by.smertex.redis.adapter.interfaces.RedisMapAdapter;
 import by.smertex.redis.exception.RedisMapAdapterException;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.util.Collection;
 import java.util.Map;
