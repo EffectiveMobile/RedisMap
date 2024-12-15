@@ -1,9 +1,9 @@
 package by.smertex.redis.adapter.realisation;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 public final class RedisMapAdapterBasicRealisation extends AbstractRedisMapAdapter {
-    public RedisMapAdapterBasicRealisation(Jedis jedis) {
-        super(jedis);
+    public RedisMapAdapterBasicRealisation(JedisPool pool) {
+        super(pool);
     }
 }
