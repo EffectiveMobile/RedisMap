@@ -12,7 +12,9 @@ public class Main {
 
         try {
             mapIntoRedis.put("neo", "max");
-            System.out.println(mapIntoRedis.get("neo").equals("max"));
+          //  System.out.println(mapIntoRedis.get("neo").equals("max"));
+
+            System.out.println("Key set" + mapIntoRedis.keySet());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
