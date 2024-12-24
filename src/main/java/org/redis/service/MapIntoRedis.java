@@ -207,7 +207,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisLocal = pool.getResource();
 
             for (Entry<? extends String, ?> iter : m.entrySet()) {
-                jedisLocal.set(iter.getKey(), (String) iter.getValue());
+                jedisLocal.mset(iter.getKey(), (String) iter.getValue());
             }
 
             pool.returnObject(jedisLocal);
