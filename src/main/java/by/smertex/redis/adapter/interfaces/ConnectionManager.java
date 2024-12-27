@@ -1,6 +1,8 @@
 package by.smertex.redis.adapter.interfaces;
 
-public interface ConnectionManager<T> {
+import java.io.Closeable;
+
+public interface ConnectionManager<T extends Closeable> {
 
     T getConnection();
 

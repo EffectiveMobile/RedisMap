@@ -8,7 +8,7 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ConnectionManagerBasicRealisation implements ConnectionManager<RedisMapAdapter> {
+public class  ConnectionManagerBasicRealisation implements ConnectionManager<RedisMapAdapter> {
 
     private final BlockingQueue<RedisMapAdapter> pool;
 

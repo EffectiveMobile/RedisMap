@@ -126,9 +126,7 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
     @Override
     public Collection<String> values() {
         try {
-            return keySet().stream()
-                    .map(jedis::get)
-                    .toList();
+            return jedis.mget(keySet().toArray(new String[0]));
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
         }
