@@ -6,7 +6,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,7 +107,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisLocal.connect();
             jedisLocal = pool.getResource();
 
-            List<String> strings = this.keySet().stream().map(j -> jedisPool.getResource().get(j)).toList();
+            Collection<String> strings = this.values();
 
             boolean res = strings.contains(value.toString());
 
@@ -240,12 +239,13 @@ public class MapIntoRedis implements Map<String, String> {
             jedisLocal.connect();
             jedisLocal = pool.getResource();
 
-            Set<String> res = jedisPool.getResource().keys("*");
+            Set<String> res = jedisLocal.keys("*");
+
+            System.out.println("Res " + res);
 
             pool.returnObject(jedisLocal);
 
             return res;
-
         }
     }
 
@@ -259,12 +259,11 @@ public class MapIntoRedis implements Map<String, String> {
             jedisLocal.connect();
             jedisLocal = pool.getResource();
 
-        Collection<String> res = this.keySet().stream().map(j -> jedisPool.getResource().get(j)).collect(Collectors.toSet());
+            Collection<String> res = this.keySet().stream().map(jedisLocal::get).collect(Collectors.toSet());
 
-        pool.returnObject(jedisLocal);
+            pool.returnObject(jedisLocal);
 
-        return  res;
-
+            return res;
         }
     }
 
