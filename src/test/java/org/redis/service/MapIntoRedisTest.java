@@ -9,7 +9,6 @@ class MapIntoRedisTest {
 
     private MapIntoRedis mapIntoRedis = new MapIntoRedis();
 
-
     @Test
     void size() {
 
@@ -73,9 +72,9 @@ class MapIntoRedisTest {
     @Test
     void remove() {
         mapIntoRedis.put("neo", "max");
-        mapIntoRedis.remove("neo");
 
-        assertFalse(mapIntoRedis.containsKey("neo"), "value: neo");
+        assertEquals("1", mapIntoRedis.remove("neo"),"value: 1");
+        assertFalse(mapIntoRedis.containsKey("neo"), "value: false");
         mapIntoRedis.clear();
     }
 

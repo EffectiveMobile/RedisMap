@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MapIntoRedis implements Map<String, String> {
 
+    private final String URL = "localhost";
+
     /**
      * экземпляр JedisPool присоединённый к 127.0.0.1 на пору 6379
      */
@@ -34,7 +36,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public int size() { //  return (int) jedis.getResource().dbSize();
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = pool.getResource();
 
@@ -51,7 +53,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public boolean isEmpty() { //  return jedis.dbSize() == 0L;
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -75,7 +77,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public boolean containsKey(Object key) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -99,7 +101,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public boolean containsValue(Object value) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -125,14 +127,14 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public String get(Object key) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
             jedisLocal.connect();
             jedisLocal = pool.getResource();
 
-            String res = jedisPool.getResource().get(key.toString());
+            String res = jedisLocal.get(key.toString());
 
             pool.returnObject(jedisLocal);
 
@@ -150,7 +152,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public String put(String key, String value) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -174,17 +176,13 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public String remove(Object key) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
             jedisLocal.connect();
             jedisLocal = pool.getResource();
-
-            jedisPool.getResource().del(key.toString());
-
-            String res = this.containsKey(key.toString()) ? key.toString() : "";
-
+            String res = jedisPool.getResource().del(key.toString()) == 0 ? "0" : "1";
             pool.returnObject(jedisLocal);
 
             return res;
@@ -199,7 +197,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -219,7 +217,7 @@ public class MapIntoRedis implements Map<String, String> {
      */
     @Override
     public void clear() {
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -235,7 +233,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public Set<String> keySet() {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
@@ -254,7 +252,7 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public Collection<String> values() {
 
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
             Jedis jedisLocal = new Jedis();
 
