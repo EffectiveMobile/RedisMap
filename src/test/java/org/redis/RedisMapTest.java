@@ -11,14 +11,26 @@ import java.util.Set;
 
 import org.redis.impl.RedisMap;
 
+/**
+ * Тестовый класс для {@link RedisMap}.
+ * Проверяет корректность работы всех методов RedisMap.
+ *
+ * @author Мельников Никита
+ */
 public class RedisMapTest {
     private final RedisMap redisMap = new RedisMap("localhost", 6379);
 
+    /**
+     * Очищает Redis перед каждым тестом.
+     */
     @BeforeEach
     public void clearRedisMap(){
         redisMap.clear();
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#size()}.
+     */
     @Test
     public void testSize() {
         assertEquals(0, redisMap.size(), "Initial size should be 0");
@@ -33,6 +45,9 @@ public class RedisMapTest {
         assertEquals(1, redisMap.size(), "Size should be 1 after removing one element");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#isEmpty()}.
+     */
     @Test
     public void testIsEmpty() {
         assertTrue(redisMap.isEmpty(), "Map should be empty initially");
@@ -44,6 +59,9 @@ public class RedisMapTest {
         assertTrue(redisMap.isEmpty(), "Map should be empty after clear");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#containsKey(Object)}.
+     */
     @Test
     public void testContainsKey() {
         assertFalse(redisMap.containsKey("key1"), "Map should not contain key1 initially");
@@ -55,6 +73,9 @@ public class RedisMapTest {
         assertFalse(redisMap.containsKey("key1"), "Map should not contain key1 after removal");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#containsValue(Object)}.
+     */
     @Test
     public void testContainsValue() {
         assertFalse(redisMap.containsValue("value1"), "Map should not contain value1 initially");
@@ -66,6 +87,9 @@ public class RedisMapTest {
         assertFalse(redisMap.containsValue("value1"), "Map should not contain value1 after removal");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#get(Object)}.
+     */
     @Test
     public void testGet() {
         assertNull(redisMap.get("key1"), "get() should return null for non-existent key");
@@ -77,6 +101,9 @@ public class RedisMapTest {
         assertEquals("updatedValue", redisMap.get("key1"), "get() should return the updated value for key1");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#put(String, String)}.
+     */
     @Test
     public void testPut() {
         assertNull(redisMap.put("key1", "value1"), "put() should return null for new key");
@@ -86,6 +113,9 @@ public class RedisMapTest {
         assertEquals("updatedValue", redisMap.get("key1"), "put() should update the value for existing key");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#remove(Object)}.
+     */
     @Test
     public void testRemove() {
         assertNull(redisMap.remove("key1"), "remove() should return null for non-existent key");
@@ -96,6 +126,9 @@ public class RedisMapTest {
         assertNull(redisMap.get("key1"), "get() should return null after removal");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#putAll(Map)}.
+     */
     @Test
     public void testPutAll() {
         Map<String, String> newEntries = Map.of("key1", "value1", "key2", "value2");
@@ -106,6 +139,9 @@ public class RedisMapTest {
         assertEquals("value2", redisMap.get("key2"), "putAll() should add key2");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#clear()}.
+     */
     @Test
     public void testClear() {
         redisMap.put("key1", "value1");
@@ -117,6 +153,9 @@ public class RedisMapTest {
         assertTrue(redisMap.isEmpty(), "clear() should make the map empty");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#keySet()}.
+     */
     @Test
     public void testKeySet() {
         redisMap.put("key1", "value1");
@@ -129,6 +168,9 @@ public class RedisMapTest {
         assertTrue(keys.contains("key2"), "keySet() should contain key2");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#values()}.
+     */
     @Test
     public void testValues() {
         redisMap.put("key1", "value1");
@@ -141,6 +183,9 @@ public class RedisMapTest {
         assertTrue(values.contains("value2"), "values() should contain value2");
     }
 
+    /**
+     * Тестирует метод {@link RedisMap#entrySet()}.
+     */
     @Test
     public void testEntrySet() {
         redisMap.put("key1", "value1");
