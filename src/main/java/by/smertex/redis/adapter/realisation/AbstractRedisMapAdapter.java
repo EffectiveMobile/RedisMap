@@ -5,9 +5,12 @@ import by.smertex.redis.exception.RedisMapAdapterException;
 import redis.clients.jedis.Jedis;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
     private static final String CONTAINS_LUA = """
@@ -99,7 +102,10 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
         try {
-            m.keySet().forEach(k -> jedis.set(k, m.get(k)));
+            String[] keyValuePairs = m.entrySet().stream()
+                    .flatMap(entry -> Stream.of(entry.getKey(), entry.getValue()))
+                    .toArray(String[]::new);
+            jedis.mset(keyValuePairs);
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
         }
@@ -135,8 +141,10 @@ public abstract class AbstractRedisMapAdapter implements RedisMapAdapter {
     @Override
     public Set<Entry<String, String>> entrySet() {
         try {
-            return keySet().stream()
-                    .map(k -> new AbstractRedisMapAdapter.EntryRedis(k, get(k)))
+            List<String> keySet = keySet().stream().toList();
+            List<String> values = jedis.mget(keySet.toArray(new String[0]));
+            return IntStream.range(0, values().size())
+                    .mapToObj(i -> new EntryRedis(keySet.get(i), values.get(i)))
                     .collect(Collectors.toSet());
         } catch (RuntimeException e) {
             throw new RedisMapAdapterException(e.getMessage());
