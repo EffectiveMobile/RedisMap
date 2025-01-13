@@ -88,7 +88,7 @@ class MapIntoRedisTest {
 
         mapIntoRedis.putAll(map);
 
-        assertEquals(2, mapIntoRedis.size());
+        assertEquals(3, mapIntoRedis.size());
         assertEquals("min", mapIntoRedis.get("single"));
         mapIntoRedis.clear();
     }

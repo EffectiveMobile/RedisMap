@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Класс пытается сделать мапу из мапы
@@ -232,9 +233,9 @@ public class MapIntoRedis implements Map<String, String> {
             jedisLocal.connect();
             jedisLocal = pool.getResource();
 
-            for (Entry<? extends String, ?> iter : m.entrySet()) {
-                jedisLocal.mset(iter.getKey(), (String) iter.getValue());
-            }
+            String[] set = m.entrySet().stream().flatMap(t-> Stream.of(t.getKey(), t.getValue())).toArray(String[]::new);
+
+            jedisLocal.mset(set);
 
             pool.returnObject(jedisLocal);
         } catch (RuntimeException e) {
@@ -298,6 +299,8 @@ public class MapIntoRedis implements Map<String, String> {
 
             jedisLocal.connect();
             jedisLocal = pool.getResource();
+
+          //  res = jedisLocal.mget("*");
 
             res = this.keySet().stream().map(jedisLocal::get).collect(Collectors.toSet());
             //  List<String> strings = jedisLocal.hget();
