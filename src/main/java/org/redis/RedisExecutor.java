@@ -12,10 +12,16 @@ public class RedisExecutor {
         this.jedisPool = jedisPool;
     }
 
-    public  <R> R execute(Function<Jedis, R> function) {
-        try (Jedis jedis = jedisPool.getResource()) {
+    public <R> R execute(Function<Jedis, R> function) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             return function.apply(jedis);
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
-
 }
+

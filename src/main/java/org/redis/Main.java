@@ -19,6 +19,7 @@ public class Main {
         System.out.println(redisMap.containsValue("value3"));
         System.out.println(redisMap.containsValue("value2"));
         System.out.println(redisMap.isEmpty());
+        System.out.println(redisMap.values());
 
 
         Map<String, String> testMap = new HashMap<>();
