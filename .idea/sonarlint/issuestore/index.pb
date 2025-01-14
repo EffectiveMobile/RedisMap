@@ -11,3 +11,7 @@ Z
 *src/main/java/org/redis/RedisExecutor.java,e\b\eb15dd6fde711c0b009ee1334da1e8c468bd55a6
 Y
 )src/test/java/org/redis/RedisMapTest.java,b\c\bcbe54eb3af35a0e2a5a7fc7f875f376e21eca2b
+]
+-.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
+S
+#.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0

@@ -4,6 +4,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.resps.ScanResult;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class RedisMap implements Map<String,String> {
     private final RedisExecutor executor;
@@ -82,7 +83,14 @@ public class RedisMap implements Map<String,String> {
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
         executor.execute(jedis -> {
-            m.forEach(jedis::mset);
+            if (!m.isEmpty()) {
+                String[] keyValuePairs = m.entrySet()
+                        .stream()
+                        .flatMap(entry -> Stream.of(entry.getKey(), entry.getValue()))
+                        .toArray(String[]::new);
+
+                jedis.mset(keyValuePairs);
+            }
             return null;
         });
     }
