@@ -160,7 +160,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res;
+        return res != null ? res : null;
     }
 
     /**
@@ -189,7 +189,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res;
+        return res != null ? res : null;
     }
 
     /**
@@ -218,7 +218,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res;
+        return res != null ? res : null;
     }
 
     /**
