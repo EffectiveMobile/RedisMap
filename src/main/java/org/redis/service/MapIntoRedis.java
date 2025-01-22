@@ -174,12 +174,14 @@ public class MapIntoRedis implements Map<String, String> {
     public String put(String key, String value) {
 
         String res = null;
-
         Jedis jedisLocal = null;
+        String valueInMap = "";
 
         try {
 
             jedisLocal = jedisPool.getResource();
+
+            valueInMap = jedisLocal.get(key);
 
             res = jedisLocal.set(key.getBytes(), value.getBytes());
         } catch (RuntimeException e) {
@@ -189,7 +191,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res != null ? res : null;
+        return res != null ? res : valueInMap;
     }
 
     /**
@@ -202,13 +204,13 @@ public class MapIntoRedis implements Map<String, String> {
     public String remove(Object key) {
 
         String res = "";
-
+        String valueInMap = "";
         Jedis jedisLocal = null;
 
         try {
 
             jedisLocal = jedisPool.getResource();
-
+            valueInMap = jedisLocal.get(key.toString());
             res = jedisLocal.del(key.toString()) == 0 ? "0" : "1";
 
         } catch (RuntimeException e) {
@@ -218,7 +220,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res != null ? res : null;
+        return res != null ? res : valueInMap;
     }
 
     /**
