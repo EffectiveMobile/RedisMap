@@ -191,7 +191,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res != null ? res : valueInMap;
+        return valueInMap;
     }
 
     /**
@@ -220,7 +220,7 @@ public class MapIntoRedis implements Map<String, String> {
             jedisPool.returnObject(jedisLocal);
         }
 
-        return res != null ? res : valueInMap;
+        return valueInMap;
     }
 
     /**
