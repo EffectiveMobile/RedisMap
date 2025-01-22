@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -38,12 +35,15 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public int size() {
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = pool.getResource();
+        try {
 
-            pool.returnObject(jedisLocal);
+            jedisLocal = jedisPool.getResource();
+
             return (int) jedisLocal.dbSize();
+        } finally {
+            jedisPool.returnObject(jedisLocal);
         }
     }
 
@@ -55,19 +55,22 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public boolean isEmpty() {
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        boolean res = false;
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
-            boolean res = jedisLocal.dbSize() == 0L;
+            res = jedisLocal.dbSize() == 0L;
 
-            pool.returnObject(jedisLocal);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
 
-            return res;
+            jedisPool.returnObject(jedisLocal);
         }
+        return res;
     }
 
     /**
@@ -81,20 +84,20 @@ public class MapIntoRedis implements Map<String, String> {
 
         boolean res = false;
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
             res = jedisLocal.exists(key.toString());
-
-            pool.returnObject(jedisLocal);
 
 
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -111,21 +114,21 @@ public class MapIntoRedis implements Map<String, String> {
 
         boolean res = false;
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
             Collection<String> strings = this.values();
 
             res = strings.contains(value.toString());
 
-            pool.returnObject(jedisLocal);
-
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -142,19 +145,19 @@ public class MapIntoRedis implements Map<String, String> {
 
         String res = "";
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
             res = jedisLocal.get(key.toString());
 
-            pool.returnObject(jedisLocal);
-
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -170,21 +173,20 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public String put(String key, String value) {
 
-        String res = "";
+        String res = null;
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
             res = jedisLocal.set(key.getBytes(), value.getBytes());
-
-            pool.returnObject(jedisLocal);
-
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -201,18 +203,19 @@ public class MapIntoRedis implements Map<String, String> {
 
         String res = "";
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
-            res = jedisPool.getResource().del(key.toString()) == 0 ? "0" : "1";
-            pool.returnObject(jedisLocal);
+            res = jedisLocal.del(key.toString()) == 0 ? "0" : "1";
 
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -226,20 +229,21 @@ public class MapIntoRedis implements Map<String, String> {
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
-            String[] set = m.entrySet().stream().flatMap(t-> Stream.of(t.getKey(), t.getValue())).toArray(String[]::new);
+            String[] set = m.entrySet().stream().flatMap(t -> Stream.of(t.getKey(), t.getValue())).toArray(String[]::new);
 
             jedisLocal.mset(set);
 
-            pool.returnObject(jedisLocal);
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
     }
 
@@ -248,18 +252,17 @@ public class MapIntoRedis implements Map<String, String> {
      */
     @Override
     public void clear() {
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
 
-            Jedis jedisLocal = new Jedis();
+        Jedis jedisLocal = null;
 
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
-
-
-            jedisPool.getResource().flushAll();
-            pool.returnObject(jedisLocal);
+        try {
+            jedisLocal = jedisPool.getResource();
+            jedisLocal.flushAll();
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
     }
 
@@ -267,22 +270,21 @@ public class MapIntoRedis implements Map<String, String> {
     public Set<String> keySet() {
 
         Set<String> res = new HashSet<>();
+        Jedis jedisLocal = null;
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        try {
 
-            Jedis jedisLocal = new Jedis();
-
-            jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
             res = jedisLocal.keys("*");
 
             System.out.println("Res " + res);
 
-            pool.returnObject(jedisLocal);
-
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
@@ -293,25 +295,22 @@ public class MapIntoRedis implements Map<String, String> {
 
         Collection<String> res = new HashSet<>();
 
-        try (JedisPool pool = new JedisPool(URL, 6379)) {
+        Jedis jedisLocal = null;
 
-            Jedis jedisLocal = new Jedis();
+        try {
+
+            jedisLocal = jedisPool.getResource();
 
             jedisLocal.connect();
-            jedisLocal = pool.getResource();
+            jedisLocal = jedisPool.getResource();
 
-          //  res = jedisLocal.mget("*");
-
-            res = this.keySet().stream().map(jedisLocal::get).collect(Collectors.toSet());
-            //  List<String> strings = jedisLocal.hget();
-
-            // List<String> result = jedisLocal.mget(.stream());
-            //   System.out.println("result " + strings);
-
-            pool.returnObject(jedisLocal);
+            res = jedis.mget(this.keySet().toArray(new String[0]));
 
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } finally {
+
+            jedisPool.returnObject(jedisLocal);
         }
 
         return res;
