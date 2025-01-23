@@ -64,12 +64,13 @@ public class RedisMap implements Map<String, String> {
     @Override
     public boolean containsValue(Object value) {
         Set<String> keys = jedis.keys("*");
-        for (String key : keys) {
-            if (jedis.get(key).equals(value)) {
-                return true;
-            }
+        if (keys.isEmpty()) {
+            return false;
         }
-        return false;
+
+        String[] keysArray = keys.toArray(new String[0]);
+        List<String> values = jedis.mget(keysArray);
+        return values.contains(value);
     }
 
     /**
@@ -117,16 +118,25 @@ public class RedisMap implements Map<String, String> {
      */
     @Override
     public void putAll(Map<? extends String, ? extends String> m) {
-        for (Entry<? extends String, ? extends String> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
+        if (m == null || m.isEmpty()) {
+            return;
         }
+
+        String[] keyValuePairs = new String[m.size() * 2];
+
+        int index = 0;
+        for (Map.Entry<? extends String, ? extends String> entry : m.entrySet()) {
+            keyValuePairs[index++] = entry.getKey();
+            keyValuePairs[index++] = entry.getValue();
+        }
+        jedis.mset(keyValuePairs);
     }
 
     /**
      * Очищает все данные в Redis.
      */
     @Override
-    public void clear() {
+    public void clear()  {
         jedis.flushDB();
     }
 
@@ -148,11 +158,12 @@ public class RedisMap implements Map<String, String> {
     @Override
     public Collection<String> values() {
         Set<String> keys = keySet();
-        List<String> values = new ArrayList<>();
-        for (String key : keys) {
-            values.add(get(key));
+        if (keys.isEmpty()) {
+            return Collections.emptyList();
         }
-        return values;
+
+        String[] keysArray = keys.toArray(new String[0]);
+        return jedis.mget(keysArray);
     }
 
     /**
@@ -163,10 +174,19 @@ public class RedisMap implements Map<String, String> {
     @Override
     public Set<Entry<String, String>> entrySet() {
         Set<String> keys = keySet();
-        Set<Entry<String, String>> entries = new HashSet<>();
-        for (String key : keys) {
-            entries.add(new AbstractMap.SimpleEntry<>(key, get(key)));
+        if (keys.isEmpty()) {
+            return Collections.emptySet();
         }
+
+        String[] keysArray = keys.toArray(new String[0]);
+        List<String> values = jedis.mget(keysArray);
+        Set<Entry<String, String>> entries = new HashSet<>();
+
+        int index = 0;
+        for (String key : keys) {
+            entries.add(new AbstractMap.SimpleEntry<>(key, values.get(index++)));
+        }
+
         return entries;
     }
 }
