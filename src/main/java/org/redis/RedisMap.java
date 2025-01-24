@@ -1,11 +1,11 @@
 package org.redis;
 
+import org.redis.exception.CacheDeletionException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.resps.ScanResult;
 
 import java.util.*;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,8 +19,14 @@ public class RedisMap implements Map<String, String> {
 
     @Override
     public int size() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             return Math.toIntExact(jedis.dbSize());
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
@@ -35,8 +41,14 @@ public class RedisMap implements Map<String, String> {
         if (key == null) {
             return false;
         }
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             return jedis.exists(key.toString());
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
@@ -45,20 +57,26 @@ public class RedisMap implements Map<String, String> {
         if (value == null) {
             return false;
         }
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             String cursor = "0";
             do {
                 ScanResult<String> scanResult = jedis.scan(cursor);
                 cursor = scanResult.getCursor();
-                for (String key : scanResult.getResult()) {
-                    if (value.toString().equals(jedis.get(key))) {
-                        return true;
-                    }
+                List<String> values = jedis.mget(scanResult.getResult().toArray(new String[0]));
+                if (values.contains(value.toString())) {
+                    return true;
                 }
             } while (!"0".equals(cursor));
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
         return false;
     }
+
 
 
     @Override
@@ -66,8 +84,14 @@ public class RedisMap implements Map<String, String> {
         if (key == null) {
             return null;
         }
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             return jedis.get(key.toString());
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
@@ -77,8 +101,15 @@ public class RedisMap implements Map<String, String> {
         if (key == null || value == null) {
             throw new IllegalArgumentException("Key and value must not be null");
         }
-        try (Jedis jedis = jedisPool.getResource()) {
-            return jedis.set(key, value);
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            jedis.set(key, value);
+            return value;
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
@@ -87,12 +118,22 @@ public class RedisMap implements Map<String, String> {
         if (key == null) {
             return null;
         }
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             String value = jedis.get(key.toString());
-            jedis.del(key.toString());
+            long deleted = jedis.del(key.toString());
+            if (deleted == 0) {
+                throw new CacheDeletionException("Failed to delete the cache for key: " + key);
+            }
             return value;
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
+
 
 
     @Override
@@ -100,33 +141,50 @@ public class RedisMap implements Map<String, String> {
         if (m == null || m.isEmpty()) {
             return;
         }
-        try (Jedis jedis = jedisPool.getResource()) {
-
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             jedis.mset(m.entrySet().stream()
                     .filter(entry -> entry.getKey() != null && entry.getValue() != null)
                     .flatMap(entry -> Stream.of(entry.getKey(), entry.getValue()))
                     .toArray(String[]::new));
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
 
     @Override
     public void clear() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             jedis.flushDB();
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
     @Override
     public Set<String> keySet() {
         Set<String> keys = new HashSet<>();
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             String cursor = "0";
             do {
                 ScanResult<String> scanResult = jedis.scan(cursor);
                 keys.addAll(scanResult.getResult());
                 cursor = scanResult.getCursor();
             } while (!"0".equals(cursor));
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
         return keys;
     }
@@ -134,13 +192,18 @@ public class RedisMap implements Map<String, String> {
 
     @Override
     public Collection<String> values() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
             Set<String> keys = keySet();
-
             List<String> results = jedis.mget(keys.toArray(new String[0]));
             return results.stream()
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
@@ -148,10 +211,17 @@ public class RedisMap implements Map<String, String> {
 
     @Override
     public Set<Entry<String, String>> entrySet() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            Jedis finalJedis = jedis;
             return keySet().stream()
-                    .map(key -> new AbstractMap.SimpleEntry<>(key, jedis.get(key)))
+                    .map(key -> new AbstractMap.SimpleEntry<>(key, finalJedis.get(key)))
                     .collect(Collectors.toSet());
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
         }
     }
 
