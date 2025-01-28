@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * Класс-прослойка между Redis и интерфейсом Map.
+ *
  * @author Даниил Астафьев
  * @version 1.0
  */
@@ -22,6 +23,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Возвращает количество ключей в текущей базе данных.
+     *
      * @return число ключей
      */
     @Override
@@ -35,6 +37,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Возвращает {@code true}, если в базе данных нет ключей.
+     *
      * @return {@code true} - если нет ключей, иначе - {@code false}
      */
     @Override
@@ -48,6 +51,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Проверяет, существует ли ключ в базе данных.
+     *
      * @param key ключ, наличие в базе данных которого проверяется
      * @return {@code true} если ключ существует, иначе - {@code false}
      */
@@ -66,6 +70,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Проверяет, существует ли значение в базе данных.
+     *
      * @param value значение, наличие в базе данных которого проверяется
      * @return {@code true} если значение существует, иначе - {@code false}
      */
@@ -89,6 +94,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Получает значение указанного ключа.
+     *
      * @param key ключ, ассоциирующийся со значением, которое нужно вернуть
      * @return значение, хранящееся под этим ключом
      */
@@ -107,7 +113,8 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Устанавливает переданное значение как значение переданного ключа.
-     * @param key ключ, с которым будет ассоциироваться указанное значение
+     *
+     * @param key   ключ, с которым будет ассоциироваться указанное значение
      * @param value значение, которое будет ассоциировано с указанным ключом
      * @return OK
      */
@@ -126,6 +133,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Удаляет указанный ключ из базы данных.
+     *
      * @param key ключ, который должен быть удален
      * @return 1 если ключ был удален, 0 если ключа не существует в базе данных
      */
@@ -144,6 +152,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Копирует все пары ключ-значение переданной {@code Map} в базу данных.
+     *
      * @param m {@code Map}, чьи пары ключ-значение будут сохранены в базе данных
      */
     @Override
@@ -178,6 +187,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Возвращает набор ключей текущей базы данных.
+     *
      * @return набор ключей
      */
     @Override
@@ -191,6 +201,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Возвращает все значения текущей базы данных.
+     *
      * @return все значения
      */
     @Override
@@ -207,6 +218,7 @@ public class RedisMap implements Map<String, String> {
 
     /**
      * Возвращает набор пар вида {@code key=value}, содержащихся в базе данных.
+     *
      * @return набор пар вида {@code key=value}
      */
     @Override

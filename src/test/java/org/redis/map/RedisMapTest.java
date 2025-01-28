@@ -2,6 +2,7 @@ package org.redis.map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.redis.map.exception.RedisMapException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -163,7 +164,7 @@ class RedisMapTest {
         redisMap.putAll(map);
 
         verify(jedisMock).mset(
-          "4", "four", "5", "five", "10", "ten"
+                "4", "four", "5", "five", "10", "ten"
         );
         verify(poolMock).getResource();
     }
@@ -205,14 +206,14 @@ class RedisMapTest {
         set.add("3");
         List<String> list = List.of("one", "two", "three");
         when(jedisMock.keys("*")).thenReturn(set);
-        when(jedisMock.mget(new String[] {"1", "2", "3"})).thenReturn(list);
+        when(jedisMock.mget(new String[]{"1", "2", "3"})).thenReturn(list);
 
         Collection<String> values = redisMap.values();
 
         assertEquals(list.size(), values.size());
 
         verify(jedisMock).keys("*");
-        verify(jedisMock).mget(new String[] {"1", "2", "3"});
+        verify(jedisMock).mget(new String[]{"1", "2", "3"});
         verify(poolMock).getResource();
     }
 
