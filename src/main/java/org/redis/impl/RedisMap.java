@@ -184,7 +184,7 @@ public class RedisMap implements Map<String, String> {
     @Override
     public void putAll(Map<? extends String, ? extends String> map) {
         try (Jedis jedis = jedisPool.getResource()) {
-            map.forEach((k, v) -> jedis.set(actualKey(k), v));
+            map.forEach((k, v) -> jedis.mset(actualKey(k), v));
         } catch (RuntimeException e) {
             throw new RedisMapException(e.getMessage());
         }
