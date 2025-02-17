@@ -24,7 +24,8 @@ public class RedisMapRepository implements Map<String, String> {
     private final RedisMapErrorHandler errorHandler;
 
     public RedisMapRepository(RedisMapErrorHandler errorHandler) {
-        this.jedisPool = RedisMapConfig.getJedisPool();
+        this.jedisPool = RedisMapConfig.getInstance()
+                .getJedisPool();
         this.errorHandler = errorHandler;
     }
 

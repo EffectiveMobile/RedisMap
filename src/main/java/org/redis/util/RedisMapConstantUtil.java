@@ -8,7 +8,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class RedisMapConstantUtil {
     public static final String REDIS_HOST = "localhost";
-    public static final int REDIS_PORT = 6379;
+    public static final int REDIS_APP_PORT = 6379;
+    public static final int REDIS_TEST_PORT = 6380;
 
     public static final int MAX_TOTAL_CONNECTIONS = 128;
     public static final int MAX_IDLE_CONNECTIONS = 32;
