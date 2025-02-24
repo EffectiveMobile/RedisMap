@@ -1,9 +1,16 @@
 version: '3.3'
 
 services:
-  redis:
-    container_name: redis
+  redis-app:
+    container_name: redis-app
     image: redis:latest
     restart: always
     ports:
       - "6379:6379"
+
+  redis-test:
+    container_name: redis-test
+    image: redis:latest
+    restart: always
+    ports:
+      - "6380:6379"
