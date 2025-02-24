@@ -9,7 +9,6 @@ import redis.clients.jedis.JedisPool;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,7 @@ public class RedisMapRepository implements Map<String, String> {
         try (Jedis jedis = jedisPool.getResource()) {
             return Math.toIntExact(jedis.dbSize());
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to get size from Redis", ex, RedisMapOperationException.class);
-            return 0;
+            throw errorHandler.handleError("Failed to get size from Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -58,8 +56,8 @@ public class RedisMapRepository implements Map<String, String> {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis.exists(key.toString());
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to check key existence in Redis", ex, RedisMapOperationException.class);
-            return false;
+            throw errorHandler.handleError("Failed to check key existence in Redis", ex,
+                    RedisMapOperationException.class);
         }
     }
 
@@ -77,8 +75,8 @@ public class RedisMapRepository implements Map<String, String> {
             }
             return false;
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to check value existence in Redis", ex, RedisMapOperationException.class);
-            return false;
+            throw errorHandler.handleError("Failed to check value existence in Redis", ex,
+                    RedisMapOperationException.class);
         }
     }
 
@@ -90,8 +88,7 @@ public class RedisMapRepository implements Map<String, String> {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis.get(key.toString());
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to get value from Redis", ex, RedisMapOperationException.class);
-            return null;
+            throw errorHandler.handleError("Failed to get value from Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -106,8 +103,7 @@ public class RedisMapRepository implements Map<String, String> {
 
             return oldValue;
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to put value into Redis", ex, RedisMapOperationException.class);
-            return null;
+            throw errorHandler.handleError("Failed to put value into Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -122,8 +118,7 @@ public class RedisMapRepository implements Map<String, String> {
 
             return oldValue;
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to remove value from Redis", ex, RedisMapOperationException.class);
-            return null;
+            throw errorHandler.handleError("Failed to remove value from Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -137,7 +132,7 @@ public class RedisMapRepository implements Map<String, String> {
                 put(entry.getKey(), entry.getValue());
             }
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to put all values into Redis", ex, RedisMapOperationException.class);
+            throw errorHandler.handleError("Failed to put all values into Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -149,7 +144,7 @@ public class RedisMapRepository implements Map<String, String> {
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.flushDB();
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to clear Redis", ex, RedisMapOperationException.class);
+            throw errorHandler.handleError("Failed to clear Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -161,8 +156,7 @@ public class RedisMapRepository implements Map<String, String> {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis.keys("*");
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to get keys from Redis", ex, RedisMapOperationException.class);
-            return Collections.emptySet();
+            throw errorHandler.handleError("Failed to get keys from Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -179,8 +173,7 @@ public class RedisMapRepository implements Map<String, String> {
             }
             return values;
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to get values from Redis", ex, RedisMapOperationException.class);
-            return Collections.emptyList();
+            throw errorHandler.handleError("Failed to get values from Redis", ex, RedisMapOperationException.class);
         }
     }
 
@@ -197,8 +190,7 @@ public class RedisMapRepository implements Map<String, String> {
             }
             return entries;
         } catch (Exception ex) {
-            errorHandler.handleError("Failed to get entries from Redis", ex, RedisMapOperationException.class);
-            return Collections.emptySet();
+            throw errorHandler.handleError("Failed to get entries from Redis", ex, RedisMapOperationException.class);
         }
     }
 }

@@ -17,7 +17,7 @@ public class RedisMapErrorHandler {
      * @param <T>           The type of exception.
      * @throws T The mapped exception.
      */
-    public <T extends Exception> void handleError(String message, Exception ex, Class<T> exceptionType) throws T {
+    public <T extends Exception> T handleError(String message, Exception ex, Class<T> exceptionType) throws T {
         log.error(message, ex);
 
         try {

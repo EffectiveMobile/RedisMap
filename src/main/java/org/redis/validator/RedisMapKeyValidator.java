@@ -19,7 +19,7 @@ public class RedisMapKeyValidator {
         if (key == null || key.trim()
                 .isEmpty()) {
             String errorMessage = "Redis key cannot be null or empty. Provided value: " + key;
-            errorHandler.handleError(errorMessage,
+            throw errorHandler.handleError(errorMessage,
                     new RedisMapValidationException(errorMessage),
                     RedisMapValidationException.class);
         }
