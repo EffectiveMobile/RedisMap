@@ -16,8 +16,7 @@ public class RedisMapValueValidator {
      * @throws RedisMapValidationException if the value is null or empty.
      */
     public static void validateValueNotNullOrEmpty(String value) {
-        if (value == null || value.trim()
-                .isEmpty()) {
+        if (value == null || value.isBlank()) {
             String errorMessage = "Redis value cannot be null or empty. Provided value: " + value;
             throw errorHandler.handleError(errorMessage,
                     new RedisMapValidationException(errorMessage),

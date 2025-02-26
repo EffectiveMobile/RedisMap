@@ -7,8 +7,6 @@ import org.redis.repository.RedisMapRepository;
 import org.redis.service.Impl.RedisMapServiceImpl;
 import org.redis.service.RedisMapService;
 import org.redis.util.builder.RedisMapDataBuilder;
-import org.redis.validator.RedisMapKeyValidator;
-import org.redis.validator.RedisMapValueValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -19,12 +17,14 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class Main {
+    private static final int DATA_COUNT = 8;
+
     public static void main(String[] args) {
         var errorHandler = new RedisMapErrorHandler();
         var repository = new RedisMapRepository(errorHandler);
         RedisMapService service = new RedisMapServiceImpl(repository);
 
-        List<RedisMapEntryDto> testData = RedisMapDataBuilder.buildData();
+        List<RedisMapEntryDto> testData = RedisMapDataBuilder.buildData(DATA_COUNT);
 
         restoreTestDataIfEmpty(service, testData);
         checkPut(service, testData);
@@ -62,8 +62,6 @@ public class Main {
 
     private static void checkPut(RedisMapService redisMapService, List<RedisMapEntryDto> testData) {
         testData.forEach(entry -> {
-            RedisMapKeyValidator.validateKeyNotNullOrEmpty(entry.getKey());
-            RedisMapValueValidator.validateValueNotNullOrEmpty(entry.getValue());
             String oldValue = redisMapService.put(entry.getKey(), entry.getValue());
             log.info("Added/Updated key: '{}', value: '{}'. Old value: '{}'", entry.getKey(), entry.getValue(),
                     oldValue);
@@ -76,10 +74,8 @@ public class Main {
     }
 
     private static void checkContainsKey(RedisMapService redisMapService, List<RedisMapEntryDto> testData) {
-        testData.forEach(entry -> {
-            RedisMapKeyValidator.validateKeyNotNullOrEmpty(entry.getKey());
-            log.info("Contains key '{}': {}", entry.getKey(), redisMapService.containsKey(entry.getKey()));
-        });
+        testData.forEach(entry -> log.info("Contains key '{}': {}", entry.getKey(),
+                redisMapService.containsKey(entry.getKey())));
     }
 
     private static void checkContainsValue(RedisMapService redisMapService, List<RedisMapEntryDto> testData) {
@@ -88,10 +84,8 @@ public class Main {
     }
 
     private static void checkGet(RedisMapService redisMapService, List<RedisMapEntryDto> testData) {
-        testData.forEach(entry -> {
-            RedisMapKeyValidator.validateKeyNotNullOrEmpty(entry.getKey());
-            log.info("Value for key '{}': '{}'", entry.getKey(), redisMapService.get(entry.getKey()));
-        });
+        testData.forEach(
+                entry -> log.info("Value for key '{}': '{}'", entry.getKey(), redisMapService.get(entry.getKey())));
     }
 
     private static void checkKeySet(RedisMapService redisMapService) {
@@ -110,11 +104,6 @@ public class Main {
         Map<String, String> testMap = testData.stream()
                 .collect(Collectors.toMap(RedisMapEntryDto::getKey, RedisMapEntryDto::getValue));
 
-        testMap.forEach((key, value) -> {
-            RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
-            RedisMapValueValidator.validateValueNotNullOrEmpty(value);
-        });
-
         redisMapService.putAll(testMap);
         log.info("Data inserted using putAll: {}", testMap);
     }
@@ -124,10 +113,8 @@ public class Main {
     }
 
     private static void checkRemove(RedisMapService redisMapService, List<RedisMapEntryDto> testData) {
-        testData.forEach(entry -> {
-            RedisMapKeyValidator.validateKeyNotNullOrEmpty(entry.getKey());
-            log.info("Removed key: '{}', value: '{}'", entry.getKey(), redisMapService.remove(entry.getKey()));
-        });
+        testData.forEach(entry -> log.info("Removed key: '{}', value: '{}'", entry.getKey(),
+                redisMapService.remove(entry.getKey())));
     }
 
     private static void checkSizeAndIsEmptyAfterRemove(RedisMapService redisMapService) {

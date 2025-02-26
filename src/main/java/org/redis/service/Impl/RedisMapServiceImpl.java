@@ -2,8 +2,11 @@ package org.redis.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redis.exception.RedisMapValidationException;
 import org.redis.repository.RedisMapRepository;
 import org.redis.service.RedisMapService;
+import org.redis.validator.RedisMapKeyValidator;
+import org.redis.validator.RedisMapValueValidator;
 
 import java.util.Collection;
 import java.util.Map;
@@ -48,6 +51,8 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public boolean containsKey(String key) {
+        RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
+
         log.info("Checking if Redis map contains key: '{}'", key);
 
         boolean containsKey = redisMapRepository.containsKey(key);
@@ -61,6 +66,8 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public boolean containsValue(String value) {
+        RedisMapValueValidator.validateValueNotNullOrEmpty(value);
+
         log.info("Checking if Redis map contains value: '{}'", value);
 
         boolean containsValue = redisMapRepository.containsValue(value);
@@ -74,6 +81,8 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public String get(String key) {
+        RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
+
         log.info("Fetching value for key: '{}'", key);
 
         String value = redisMapRepository.get(key);
@@ -87,6 +96,9 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public String put(String key, String value) {
+        RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
+        RedisMapValueValidator.validateValueNotNullOrEmpty(value);
+
         log.info("Inserting value '{}' for key: '{}'", value, key);
 
         String oldValue = redisMapRepository.put(key, value);
@@ -100,6 +112,8 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public String remove(String key) {
+        RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
+
         log.info("Removing key: '{}'", key);
 
         String removedValue = redisMapRepository.remove(key);
@@ -113,6 +127,15 @@ public class RedisMapServiceImpl implements RedisMapService {
      */
     @Override
     public void putAll(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            throw new RedisMapValidationException("Map is null or empty");
+        }
+
+        map.forEach((key, value) -> {
+            RedisMapKeyValidator.validateKeyNotNullOrEmpty(key);
+            RedisMapValueValidator.validateValueNotNullOrEmpty(value);
+        });
+
         log.info("Inserting {} key-value pairs into Redis map: {}", map.size(), map);
 
         redisMapRepository.putAll(map);
